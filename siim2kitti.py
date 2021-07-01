@@ -56,13 +56,13 @@ def siim_bbox_parser(x, y, width, height):
     bbox_left = x
     
     # ymax
-    bbox_top = y + height
+    bbox_top = y
     
     # xmax
     bbox_right = x + width
     
     # ymin
-    bbox_bottom = y
+    bbox_bottom = y + height
     
     return bbox_left, bbox_top, bbox_right, bbox_bottom
 
@@ -110,23 +110,20 @@ def convert_kitti(data, train_dir, output_dir, pixel, with_opacity=True, img_idx
             with open("{}/formatted/labels/{}.txt".format(output_dir, current_data_index), "a") as file:
                 while object_count < number_of_obj:
                     kitti_object = {"type": "", "truncated": "0", "occluded": "0", "alpha": "0",
-                                    "bbox_left": "", "bbox_bottom": "", "bbox_right": "", "bbox_top": "",
+                                    "bbox_left": "", "bbox_top": "", "bbox_right": "", "bbox_bottom": "",
                                     "dim-height": "0", "dim-width": "0", "dim-length": "0",
                                     "loc-X": "0", "loc-Y": "0", "loc-Z": "0", "rotation-y": "0"}
 
                     obj_class = obj[index:index + 6][0]
                     kitti_object["type"] = obj_class
                     
-                    print(list(ast.literal_eval(info["boxes"])[object_count].values()))
-                    
                     bbox = siim_bbox_parser(*list(ast.literal_eval(info["boxes"])[object_count].values()))
                     print(bbox)
-
+                    print("x-scale-factor: {} y-scale-factor: {}".format(x_scale_factor, y_scale_factor))
                     kitti_object["bbox_left"] = str(bbox[0] * x_scale_factor)
                     kitti_object["bbox_top"] = str(bbox[1] * y_scale_factor)
                     kitti_object["bbox_right"] = str(bbox[2] * x_scale_factor)
                     kitti_object["bbox_bottom"] = str(bbox[3] * y_scale_factor)
-                    
                     print(kitti_object)
                     
                     index += 6
@@ -138,7 +135,7 @@ def convert_kitti(data, train_dir, output_dir, pixel, with_opacity=True, img_idx
                     # save study
                     with open("{}/studies/{}.txt".format(output_dir, info["StudyInstanceUID"]), "a") as study_file:
                         study_file.write(info["id"] + "\n")
-           # break
+            #break
                                                                                                                                         
     else:
         
@@ -156,7 +153,7 @@ def convert_kitti(data, train_dir, output_dir, pixel, with_opacity=True, img_idx
             with open("{}/formatted/labels/{}.txt".format(output_dir, current_data_index), "a") as file:
                 
                 kitti_object = {"type": "none", "truncated": "0", "occluded": "0", "alpha": "0",
-                                    "bbox_left": "0", "bbox_top": "1", "bbox_right": "0", "bbox_bottom": "1",
+                                    "bbox_left": "0", "bbox_top": "0", "bbox_right": "1", "bbox_bottom": "1",
                                     "dim-height": "0", "dim-width": "0", "dim-length": "0",
                                     "loc-X": "0", "loc-Y": "0", "loc-Z": "0", "rotation-y": "0"}
                 
@@ -168,7 +165,7 @@ def convert_kitti(data, train_dir, output_dir, pixel, with_opacity=True, img_idx
 
                     study_file.write(info["id"] + "\n")
                     
-           # break
+            #break
                                         
                     
     return img_idx_array
@@ -179,7 +176,7 @@ def main():
     parser.add_argument("--l", "--label", help="file path of label csv", type=str)
     parser.add_argument("--t", "--train", help="file path of train csv", type=str)
     parser.add_argument("--kf", "--output_dir", help="file path for kitti output", type=str)
-    parser.add_argument("--px", "--pixel", help="specify pixel for resized images", type=str)
+    parser.add_argument("--px", "--pixel", help="specify pixel for resized images", type=int)
     args = parser.parse_args()
     
     if not args.l:
