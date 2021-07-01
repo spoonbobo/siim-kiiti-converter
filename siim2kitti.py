@@ -29,6 +29,7 @@ def siim_resize_image(path, pixel):
     # resize
     img = cv2.resize(img, (pixel,pixel))
     img_array = np.array(img)
+    img_array = cv2.cvtColor(img_array, cv2.COLOR_GRAY2RGB)
     
     x_scale_factor, y_scale_factor = pixel / original_width, pixel / original_height
     
@@ -109,19 +110,24 @@ def convert_kitti(data, train_dir, output_dir, pixel, with_opacity=True, img_idx
             with open("{}/formatted/labels/{}.txt".format(output_dir, current_data_index), "a") as file:
                 while object_count < number_of_obj:
                     kitti_object = {"type": "", "truncated": "0", "occluded": "0", "alpha": "0",
-                                    "bbox_left": "", "bbox_top": "", "bbox_right": "", "bbox_bottom": "",
+                                    "bbox_left": "", "bbox_bottom": "", "bbox_right": "", "bbox_top": "",
                                     "dim-height": "0", "dim-width": "0", "dim-length": "0",
                                     "loc-X": "0", "loc-Y": "0", "loc-Z": "0", "rotation-y": "0"}
 
                     obj_class = obj[index:index + 6][0]
                     kitti_object["type"] = obj_class
                     
-                    bbox = list(ast.literal_eval(info["boxes"])[object_count].values())
+                    print(list(ast.literal_eval(info["boxes"])[object_count].values()))
+                    
+                    bbox = siim_bbox_parser(*list(ast.literal_eval(info["boxes"])[object_count].values()))
+                    print(bbox)
 
                     kitti_object["bbox_left"] = str(bbox[0] * x_scale_factor)
                     kitti_object["bbox_top"] = str(bbox[1] * y_scale_factor)
                     kitti_object["bbox_right"] = str(bbox[2] * x_scale_factor)
                     kitti_object["bbox_bottom"] = str(bbox[3] * y_scale_factor)
+                    
+                    print(kitti_object)
                     
                     index += 6
                     object_count += 1
@@ -132,6 +138,7 @@ def convert_kitti(data, train_dir, output_dir, pixel, with_opacity=True, img_idx
                     # save study
                     with open("{}/studies/{}.txt".format(output_dir, info["StudyInstanceUID"]), "a") as study_file:
                         study_file.write(info["id"] + "\n")
+           # break
                                                                                                                                         
     else:
         
@@ -149,7 +156,7 @@ def convert_kitti(data, train_dir, output_dir, pixel, with_opacity=True, img_idx
             with open("{}/formatted/labels/{}.txt".format(output_dir, current_data_index), "a") as file:
                 
                 kitti_object = {"type": "none", "truncated": "0", "occluded": "0", "alpha": "0",
-                                    "bbox_left": "0", "bbox_top": "1", "bbox_right": "1", "bbox_bottom": "0",
+                                    "bbox_left": "0", "bbox_top": "1", "bbox_right": "0", "bbox_bottom": "1",
                                     "dim-height": "0", "dim-width": "0", "dim-length": "0",
                                     "loc-X": "0", "loc-Y": "0", "loc-Z": "0", "rotation-y": "0"}
                 
@@ -160,6 +167,8 @@ def convert_kitti(data, train_dir, output_dir, pixel, with_opacity=True, img_idx
                 with open("{}/studies/{}.txt".format(output_dir, info["StudyInstanceUID"]), "a") as study_file:
 
                     study_file.write(info["id"] + "\n")
+                    
+           # break
                                         
                     
     return img_idx_array
@@ -198,4 +207,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
