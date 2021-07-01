@@ -152,7 +152,7 @@ def convert_kitti(data, train_dir, output_dir, pixel, with_opacity=True, img_idx
                         
             with open("{}/formatted/labels/{}.txt".format(output_dir, current_data_index), "a") as file:
                 
-                kitti_object = {"type": "none", "truncated": "0", "occluded": "0", "alpha": "0",
+                kitti_object = {"type": "DontCare", "truncated": "0", "occluded": "0", "alpha": "0",
                                     "bbox_left": "0", "bbox_top": "0", "bbox_right": "1", "bbox_bottom": "1",
                                     "dim-height": "0", "dim-width": "0", "dim-length": "0",
                                     "loc-X": "0", "loc-Y": "0", "loc-Z": "0", "rotation-y": "0"}
