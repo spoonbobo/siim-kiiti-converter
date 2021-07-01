@@ -140,7 +140,7 @@ def convert_kitti(data, train_dir, output_dir, pixel, with_opacity=True, img_idx
             current_data_index = str(img_idx_array.pop()).zfill(6)
             
             # image preprocessing
-            img_array, x_scale_factor, y_scale_factor = siim_resize_image(info["img_path"], 256)
+            img_array, x_scale_factor, y_scale_factor = siim_resize_image(info["img_path"], pixel)
             
             # save image    
             im = Image.fromarray(img_array)
